@@ -79,6 +79,9 @@ enum X86Features1ECX {
     avx = 1 << 28,
     rdrnd = 1 << 30,
     cmpxchg16b = 1 << 13,
+    f16c = 1 << 29,
+    est_speedstep = 1 << 7,
+    smx_trusted_execution = 1 << 6,
 }
 
 #[allow(non_camel_case_types)]
@@ -106,12 +109,17 @@ enum X86Features70EBX {
     avx512_bw = 1 << 30,
     avx512_dq = 1 << 17,
     sgx = 1 << 2,
+    avx512_ifma = 1 << 21,
+    avx512_vl = 1 << 31,
+    mpx = 1 << 14,
 }
 
 #[allow(non_camel_case_types)]
 #[derive(Copy, Clone, Debug, EnumIter, EnumString)]
 enum X86Features70EDX {
     cet_ibt = 1 << 20,
+    avx512_vp2intersect = 1 << 8,
+    serialize = 1 << 14,
 }
 
 #[allow(non_camel_case_types)]
@@ -119,4 +127,8 @@ enum X86Features70EDX {
 enum X86Features70ECX {
     cet_ss = 1 << 7,
     avx512_bitalg = 1 << 12,
+    avx512_vbmi = 1 << 1,
+    avx512_vbmi2 = 1 << 6,
+    avx512_vnni = 1 << 11,
+    avx512_vpopcntdq = 1 << 14,
 }
