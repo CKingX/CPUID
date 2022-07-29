@@ -47,9 +47,14 @@ fn main() {
         _ = writeln!(&mut output, "{:?}: {result}", feature);
     }
 
-    let (_, _, ecx, _) = parse(&full_cpuid_801);
+    let (_, _, ecx, edx) = parse(&full_cpuid_801);
     for feature in X86Features80000001_ECX::iter() {
         let result = test_feature(ecx, feature as u32);
+        _ = writeln!(&mut output, "{:?}: {result}", feature);
+    }
+
+    for feature in X86Features80000001_EDX::iter() {
+        let result = test_feature(edx, feature as u32);
         _ = writeln!(&mut output, "{:?}: {result}", feature);
     }
 
@@ -164,4 +169,11 @@ enum X86Features80000001_ECX {
     sse4a = 1 << 6,
     skinit = 1 << 12,
     AMD_V = 1 << 2,
+}
+
+#[allow(non_camel_case_types)]
+#[derive(Copy, Clone, Debug, EnumIter, EnumString)]
+enum X86Features80000001_EDX {
+    pae = 1 << 6,
+    nx = 1 << 20,
 }
