@@ -9,6 +9,8 @@ fn main() {
     // Get from https://github.com/InstLatx64/InstLatx64/tree/e833cd79ce0aab79df0d2879b14e01d4edd359b7/GenuineIntel
     let full_cpuid_1 = args.next().unwrap();
     let full_cpuid_7 = args.next().unwrap();
+    let full_cpuid_13 = args.next().unwrap();
+    let full_cpuid_801 = args.next().unwrap();
     let (_, _, ecx, edx) = parse(&full_cpuid_1);
 
     for feature in X86Features1ECX::iter() {
@@ -34,6 +36,19 @@ fn main() {
     }
 
     for feature in X86Features70ECX::iter() {
+        let result = test_feature(ecx, feature as u32);
+        _ = writeln!(&mut output, "{:?}: {result}", feature);
+    }
+
+    let (eax, _, _, _) = parse(&full_cpuid_13);
+
+    for feature in X86Features13_1EAX::iter() {
+        let result = test_feature(eax, feature as u32);
+        _ = writeln!(&mut output, "{:?}: {result}", feature);
+    }
+
+    let (_, _, ecx, _) = parse(&full_cpuid_801);
+    for feature in X86Features80000001_ECX::iter() {
         let result = test_feature(ecx, feature as u32);
         _ = writeln!(&mut output, "{:?}: {result}", feature);
     }
@@ -82,6 +97,7 @@ enum X86Features1ECX {
     f16c = 1 << 29,
     est_speedstep = 1 << 7,
     smx_trusted_execution = 1 << 6,
+    virtualization = 1 << 5,
 }
 
 #[allow(non_camel_case_types)]
@@ -131,4 +147,21 @@ enum X86Features70ECX {
     avx512_vbmi2 = 1 << 6,
     avx512_vnni = 1 << 11,
     avx512_vpopcntdq = 1 << 14,
+}
+
+#[allow(non_camel_case_types)]
+#[derive(Copy, Clone, Debug, EnumIter, EnumString)]
+enum X86Features13_1EAX {
+    xsaveopt = 1 << 0,
+    xsavec = 1 << 1,
+    xsaves = 1 << 3,
+}
+
+#[allow(non_camel_case_types)]
+#[derive(Copy, Clone, Debug, EnumIter, EnumString)]
+enum X86Features80000001_ECX {
+    abm_popcnt_lzcnt = 1 << 5,
+    sse4a = 1 << 6,
+    skinit = 1 << 12,
+    AMD_V = 1 << 2,
 }
