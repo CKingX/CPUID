@@ -9,7 +9,7 @@ fn main() {
     // Get from https://github.com/InstLatx64/InstLatx64/tree/e833cd79ce0aab79df0d2879b14e01d4edd359b7/GenuineIntel
     let full_cpuid_1 = args.next().unwrap();
     let full_cpuid_7 = args.next().unwrap();
-    let full_cpuid_13 = args.next().unwrap();
+    let full_cpuid_13_1 = args.next().unwrap();
     let full_cpuid_801 = args.next().unwrap();
     let (_, _, ecx, edx) = parse(&full_cpuid_1);
 
@@ -40,7 +40,7 @@ fn main() {
         _ = writeln!(&mut output, "{:?}: {result}", feature);
     }
 
-    let (eax, _, _, _) = parse(&full_cpuid_13);
+    let (eax, _, _, _) = parse(&full_cpuid_13_1);
 
     for feature in X86Features13_1EAX::iter() {
         let result = test_feature(eax, feature as u32);
@@ -152,6 +152,9 @@ enum X86Features70ECX {
     avx512_vbmi2 = 1 << 6,
     avx512_vnni = 1 << 11,
     avx512_vpopcntdq = 1 << 14,
+    avx512_gfni = 1 << 8,
+    avx512_vaes = 1 << 9,
+    avx512_vpclmulqdq = 1 << 10,
 }
 
 #[allow(non_camel_case_types)]
@@ -168,7 +171,9 @@ enum X86Features80000001_ECX {
     abm_popcnt_lzcnt = 1 << 5,
     sse4a = 1 << 6,
     skinit = 1 << 12,
-    AMD_V = 1 << 2,
+    amd_v = 1 << 2,
+    lahf_lm = 1 << 0,
+    prefetch = 1 << 8,
 }
 
 #[allow(non_camel_case_types)]
@@ -176,4 +181,5 @@ enum X86Features80000001_ECX {
 enum X86Features80000001_EDX {
     pae = 1 << 6,
     nx = 1 << 20,
+    x64 = 1 << 29,
 }
