@@ -134,6 +134,7 @@ enum X86Features70EBX {
     avx512_vl = 1 << 31,
     mpx = 1 << 14,
     ermsb = 1 << 9,
+    smap = 1 << 20,
 }
 
 #[allow(non_camel_case_types)]
