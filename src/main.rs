@@ -23,7 +23,7 @@ fn main() {
         _ = writeln!(&mut output, "{:?}: {result}", feature);
     }
 
-    let (_, ebx, ecx, edx) = parse(&full_cpuid_7);
+    let (eax, ebx, ecx, edx) = parse(&full_cpuid_7);
 
     for feature in X86Features70EBX::iter() {
         let result = test_feature(ebx, feature as u32);
@@ -37,6 +37,11 @@ fn main() {
 
     for feature in X86Features70ECX::iter() {
         let result = test_feature(ecx, feature as u32);
+        _ = writeln!(&mut output, "{:?}: {result}", feature);
+    }
+
+    for feature in X86Features70EAX::iter() {
+        let result = test_feature(eax, feature as u32);
         _ = writeln!(&mut output, "{:?}: {result}", feature);
     }
 
@@ -113,6 +118,12 @@ enum X86Features1EDX {
     fxsr = 1 << 24,
     mmx = 1 << 23,
     hyperthreading_smt = 1 << 28,
+}
+
+#[allow(non_camel_case_types)]
+#[derive(Copy, Clone, Debug, EnumIter, EnumString)]
+enum X86Features70EAX {
+    lam = 1 << 26,
 }
 
 #[allow(non_camel_case_types)]
