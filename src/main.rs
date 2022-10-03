@@ -11,6 +11,7 @@ fn main() {
     let full_cpuid_7 = args.next().unwrap();
     let full_cpuid_13_1 = args.next().unwrap();
     let full_cpuid_801 = args.next().unwrap();
+    let full_cpuid_821 = args.next().unwrap();
     let (_, _, ecx, edx) = parse(&full_cpuid_1);
 
     for feature in X86Features1ECX::iter() {
@@ -60,6 +61,12 @@ fn main() {
 
     for feature in X86Features80000001_EDX::iter() {
         let result = test_feature(edx, feature as u32);
+        _ = writeln!(&mut output, "{:?}: {result}", feature);
+    }
+
+    let (eax,_,_,_) = parse(&full_cpuid_821);
+    for feature in X86Features80000021_EAX::iter() {
+        let result = test_feature(eax, feature as u32);
         _ = writeln!(&mut output, "{:?}: {result}", feature);
     }
 
@@ -195,4 +202,10 @@ enum X86Features80000001_EDX {
     pae = 1 << 6,
     nx = 1 << 20,
     x64 = 1 << 29,
+}
+
+#[allow(non_camel_case_types)]
+#[derive(Copy, Clone, Debug, EnumIter, EnumString)]
+enum X86Features80000021_EAX {
+    uai = 1 << 7,
 }
