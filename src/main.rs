@@ -4,12 +4,20 @@ use strum_macros::{EnumIter, EnumString};
 
 fn main() {
     let mut output = String::new();
+    let args = std::env::args().count();
+
+    if args != 8 {
+        println!("You need CPUID1, 7_0, 7_1, D_1, 24-0, 801, and 821 from ADI");
+        std::process::exit(0);
+    }
     let mut args = std::env::args().skip(1);
 
     // Get from https://github.com/InstLatx64/InstLatx64/tree/e833cd79ce0aab79df0d2879b14e01d4edd359b7/GenuineIntel
     let full_cpuid_1 = args.next().unwrap();
-    let full_cpuid_7 = args.next().unwrap();
+    let full_cpuid_7_0 = args.next().unwrap();
+    let full_cpuid_7_1 = args.next().unwrap();
     let full_cpuid_13_1 = args.next().unwrap();
+    let full_cpuid_24_0 = args.next().unwrap();
     let full_cpuid_801 = args.next().unwrap();
     let full_cpuid_821 = args.next().unwrap();
     let (_, _, ecx, edx) = parse(&full_cpuid_1);
@@ -24,7 +32,7 @@ fn main() {
         _ = writeln!(&mut output, "{:?}: {result}", feature);
     }
 
-    let (eax, ebx, ecx, edx) = parse(&full_cpuid_7);
+    let (eax, ebx, ecx, edx) = parse(&full_cpuid_7_0);
 
     for feature in X86Features70EBX::iter() {
         let result = test_feature(ebx, feature as u32);
@@ -45,6 +53,14 @@ fn main() {
         let result = test_feature(eax, feature as u32);
         _ = writeln!(&mut output, "{:?}: {result}", feature);
     }
+
+    let (_, _, _, edx) = parse(&full_cpuid_7_1);
+
+    for feature in X86Features71EDX::iter() {
+        let result = test_feature(edx, feature as u32);
+        _ = writeln!(&mut output, "{:?}: {result}", feature);
+    }
+
 
     let (eax, _, _, _) = parse(&full_cpuid_13_1);
 
@@ -69,6 +85,17 @@ fn main() {
         let result = test_feature(eax, feature as u32);
         _ = writeln!(&mut output, "{:?}: {result}", feature);
     }
+
+    let (_,ebx,_,_) = parse(&full_cpuid_24_0);
+    for feature in X86Features24_0_EBX::iter() {
+        let result = test_feature(ebx, feature as u32);
+        _ = writeln!(&mut output, "{:?}: {result}", feature);
+    }
+
+    // AVX10 version check
+    let mut avx_version = u32::from_str_radix(ebx, 16).unwrap();
+    avx_version &= 0x000000FF;
+    _ = writeln!(&mut output, "avx10_version: {avx_version}");
 
     let mut output: Vec<_> = output.lines().collect();
     output.sort();
@@ -179,6 +206,12 @@ enum X86Features70ECX {
 
 #[allow(non_camel_case_types)]
 #[derive(Copy, Clone, Debug, EnumIter, EnumString)]
+enum X86Features71EDX {
+    avx10 = 1 << 19,
+}
+
+#[allow(non_camel_case_types)]
+#[derive(Copy, Clone, Debug, EnumIter, EnumString)]
 enum X86Features13_1EAX {
     xsaveopt = 1 << 0,
     xsavec = 1 << 1,
@@ -208,4 +241,11 @@ enum X86Features80000001_EDX {
 #[derive(Copy, Clone, Debug, EnumIter, EnumString)]
 enum X86Features80000021_EAX {
     uai = 1 << 7,
+}
+
+#[allow(non_camel_case_types)]
+#[derive(Copy, Clone, Debug, EnumIter, EnumString)]
+enum X86Features24_0_EBX {
+    avx10_256 = 1 << 17,
+    avx10_512 = 1 << 18,
 }
